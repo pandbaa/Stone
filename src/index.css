@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-top: #826f54;
+  --color-primary-bottom: #685842;
+  --color-secondary: #f9edd0;
+  --color-black: #000;
+  --color-white: #f9f9f9;
+  --color-transparent: transparent;
+  --font-serif: "Cormorant2", "Cormorant", serif;
+}
+
+@font-face {
+  font-family: "Cormorant2";
+  src: url("../fonts/Cormorant-SemiBold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cormorant";
+  src: url("../fonts/Cormorant-SemiBold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@layer base {
+  html, body {
+    @apply font-serif;
+    font-weight: 700;
+  }
+  button, input, select, textarea {
+    @apply font-serif;
+    font-weight: 700;
+  }
+}
+
+:root { 
+  line-height: 1.5;
+  font-weight: 700;
+  font-size: 18px;
+
+  color-scheme: light dark;
+  color: #333;
+  background-color: #3783a9;
+  background-image: url(../img/bg.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+@layer components {
+  .button {
+    @apply bg-gradient-to-r from-primary-top to-primary-bottom text-white py-3 px-4 rounded-lg text-xl cursor-pointer transition-colors;
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:shadow-xl hover:scale-105 hover:text-xl;
+  }
+  .secondary {
+    @apply bg-secondary text-black bg-none;
+  }
+}

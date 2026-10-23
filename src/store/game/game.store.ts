@@ -24,7 +24,7 @@ const initialGameData = {
   },
   currentTurn: "player",
   isGameOver: false,
-};
+} satisfies Partial<IGameStore>;
 
 const getNewMana = (newTurn: TPlayer, currentMana: number) => {
   return newTurn === "player" ? Math.min(currentMana + 1, 6) : currentMana;
@@ -34,6 +34,8 @@ const resetAttack = (deck: IGameCard[]) =>
     ...card,
     isCanAttack: card.isOnBoard,
   }));
+const getCardById = (cardId: number, deck: IGameCard[]) =>
+  deck.find((card) => card.id === cardId);
 
 const useGameStore = create<IGameStore>((set, get) => ({
   ...initialGameData,
@@ -77,6 +79,70 @@ const useGameStore = create<IGameStore>((set, get) => ({
 
     set(isPlayerTurn ? { player: updatedPlayer } : { opponent: updatedPlayer });
   },
-  attackCard: (attackerId: number, targetId: number) => {},
-  attackHero: () => {},
+  attackCard: (attackerId: number, targetId: number, attackerType: TPlayer) => {
+    set((state) => {
+      const isAttackerPlayer = attackerType === "player";
+
+      const attackerDeck = isAttackerPlayer
+        ? state.player.deck
+        : state.opponent.deck;
+
+      const targetDeck = isAttackerPlayer
+        ? state.opponent.deck
+        : state.player.deck;
+
+      const attacker = getCardById(attackerId, attackerDeck);
+      const target = getCardById(targetId, targetDeck);
+
+      if (!attacker || !target || !attacker.isCanAttack) return state;
+
+      const targetHealth = target.health - attacker.attack;
+
+      const updatedAttackerDeck = attackerDeck.map((card) =>
+        card.id === attackerId ? { ...card, isCanAttack: false } : card,
+      );
+
+      const updatedTargetDeck =
+        targetHealth <= 0
+          ? targetDeck.filter((card) => card.id !== targetId)
+          : targetDeck.map((card) =>
+              card.id === targetId ? { ...card, health: targetHealth } : card,
+            );
+
+      return {
+        player: {
+          ...state.player,
+          deck: isAttackerPlayer ? updatedAttackerDeck : updatedTargetDeck,
+        },
+        opponent: {
+          ...state.opponent,
+          deck: isAttackerPlayer ? updatedTargetDeck : updatedAttackerDeck,
+        },
+      };
+    });
+  },
+  attackHero: (attackerId: number) => {
+    set((state) => {
+      const isAttackerPlayer = state.currentTurn === "player";
+
+      const attacker = getCardById(
+        attackerId,
+        isAttackerPlayer ? state.opponent.deck : state.player.deck,
+      );
+      const opponentTaunt = isAttackerPlayer
+        ? state.opponent.deck.find((card) => card.type === "taunt")
+        : state.player.deck.find((card) => card.type === "taunt");
+
+      if (attacker && attacker.isCanAttack && !opponentTaunt) {
+        const opponent = state[isAttackerPlayer ? "opponent" : "player"];
+        opponent.health -= attacker.attack;
+        attacker.isCanAttack = false;
+        if (opponent.health <= 0) {
+          state.isGameOver = true;
+        }
+      }
+
+      return { player: state.player, opponent: state.opponent, isGameOver: state.isGameOver };
+    });
+  },
 }));

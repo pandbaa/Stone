@@ -22,6 +22,10 @@ export interface IGameStore {
   startGame: () => void;
   endTurn: () => void;
   playCard: (cardId: number) => void;
-  attackCard: (attacherId: number, targetId: number) => void;
+  attackCard: (
+    attacherId: number,
+    targetId: number,
+    attackerType: TPlayer,
+  ) => void;
   attackHero: (attacherId: number) => void;
 }

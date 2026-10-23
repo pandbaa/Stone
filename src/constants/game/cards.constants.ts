@@ -41,7 +41,8 @@ export const CARDS : ICard[] = [
     "name": "Necromancer",
     "mana": 6,
     "health": 7,
-    "attack": 5
+    "attack": 5,
+    "type": "taunt"
   },
   {
     "name": "Guardian",
@@ -65,7 +66,8 @@ export const CARDS : ICard[] = [
     "name": "Berserker",
     "mana": 5,
     "health": 6,
-    "attack": 4
+    "attack": 4,
+    "type": "taunt"
   },
   {
     "name": "Shadow",
@@ -95,7 +97,8 @@ export const CARDS : ICard[] = [
     "name": "Spark",
     "mana": 3,
     "health": 6,
-    "attack": 1
+    "attack": 1,
+    "type": "taunt"
   },
   {
     "name": "Dragonborn",
@@ -113,7 +116,8 @@ export const CARDS : ICard[] = [
     "name": "Fang",
     "mana": 4,
     "health": 6,
-    "attack": 3
+    "attack": 3,
+    "type": "taunt"
   },
   {
     "name": "Harpy",
@@ -125,7 +129,8 @@ export const CARDS : ICard[] = [
     "name": "Inquisitor",
     "mana": 3,
     "health": 5,
-    "attack": 2
+    "attack": 2,
+    "type": "taunt"
   },
   {
     "name": "Bard",

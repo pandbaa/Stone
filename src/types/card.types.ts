@@ -1,6 +1,4 @@
-export enum EnumTypeCard {
-  "taunt",
-}
+export type EnumTypeCard = "taunt";
 
 export interface ICard {
   name: string;

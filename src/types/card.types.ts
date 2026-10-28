@@ -6,4 +6,5 @@ export interface ICard {
   health: number;
   attack: number;
   type?: EnumTypeCard;
+  imageUrl: string;
 }

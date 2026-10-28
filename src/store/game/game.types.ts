@@ -15,6 +15,7 @@ export interface IHero {
 }
 
 export interface IGameStore {
+  isGameStarted: boolean;
   player: IHero;
   opponent: IHero;
   currentTurn: TPlayer;

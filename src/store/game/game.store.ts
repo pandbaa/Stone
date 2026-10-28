@@ -11,20 +11,24 @@ export function createDeck(): IGameCard[] {
   }));
 }
 
-const initialGameData = {
+const initialGameData: Pick<
+  IGameStore,
+  "player" | "opponent" | "currentTurn" | "isGameOver" | "isGameStarted"
+> = {
   player: {
     deck: createDeck(),
     health: 25,
-    mana: 1,
+    mana: 100,
   },
   opponent: {
     deck: createDeck(),
     health: 25,
-    mana: 1,
+    mana: 100,
   },
   currentTurn: "player",
   isGameOver: false,
-} satisfies Partial<IGameStore>;
+  isGameStarted: true,
+};
 
 const getNewMana = (newTurn: TPlayer, currentMana: number) => {
   return newTurn === "player" ? Math.min(currentMana + 1, 6) : currentMana;
@@ -39,6 +43,7 @@ const getCardById = (cardId: number, deck: IGameCard[]) =>
 
 const useGameStore = create<IGameStore>((set, get) => ({
   ...initialGameData,
+  isGameStarted: false,
   startGame: () => set(initialGameData),
   endTurn: () => {
     const state = get();
@@ -142,7 +147,13 @@ const useGameStore = create<IGameStore>((set, get) => ({
         }
       }
 
-      return { player: state.player, opponent: state.opponent, isGameOver: state.isGameOver };
+      return {
+        player: state.player,
+        opponent: state.opponent,
+        isGameOver: state.isGameOver,
+      };
     });
   },
 }));
+
+export { useGameStore };

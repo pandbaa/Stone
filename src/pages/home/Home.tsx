@@ -1,12 +1,10 @@
-import { Button } from "../../components/ui/button/Button"
+import { useGameStore } from "../../store/game/game.store";
+import { GameBoard } from "./board/GameBoard";
+import { WelcomeScreen } from "./WelcomeScreen";
 
-function App() {
-  return (
-    <>
-      <h1 className="text-3xl font-bold underline">start</h1>
-      <Button>start</Button>
-    </>
-  )
+function Home() {
+  const { isGameStarted } = useGameStore();
+  return <main>{isGameStarted ? <GameBoard /> : <WelcomeScreen />}</main>;
 }
 
-export default App
+export default Home;

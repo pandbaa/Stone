@@ -36,9 +36,9 @@
 }
 
 :root { 
-  line-height: 1.5;
+  line-height: 1.1;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 25px;
 
   color-scheme: light dark;
   color: #333;

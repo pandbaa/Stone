@@ -1,4 +1,6 @@
 import { useGameStore } from "../../../store/game/game.store";
+import { HandCard } from "./HandCard";
+import { PlayerInfo } from "./PlayerInfo";
 
 export function GameBoard() {
   const { player, opponent, playCard, endTurn, currentTurn } = useGameStore();
@@ -14,34 +16,29 @@ export function GameBoard() {
   };
 
   return (
-    <div>
-      <p>Текущий ход: {currentTurn}</p>
-      <button onClick={endTurn}>Закончить ход</button>
-      <div>
-        <div>
-          <h1>Opponent</h1>
-          <p>HP: {opponent.health}</p>
-          <p>Mana: {opponent.mana}</p>
-        </div>
-        <div className="-mt-30 flex items-center justify-center">
+    <div className="h-screen w-full flex flex-col justify-between overflow-hidden">
+      <div className="relative">
+        <PlayerInfo player={opponent} typePlayer="opponent" />
+        <div className="flex items-center justify-center -mt-4">
           {opponent.deck
             .filter((card) => !card.isOnBoard)
             .slice(0, 6)
             .map((card, index, array) => (
-              <button
-                className="h-36 w-24 bg-white inline-block -ml-2 rounded-lg"
+              <HandCard
+                card={card}
+                isHided
                 style={{
                   transform: `rotate(${calculateRotationOpponent(index, array.length)}deg)`,
                 }}
                 key={card.id}
                 onClick={() => playCard(card.id)}
-              />
+              ></HandCard>
             ))}
         </div>
       </div>
 
       <section>
-        <div className="h-56">
+        <div className="h-37">
           {opponent.deck
             .filter((card) => card.isOnBoard)
             .map((card) => (
@@ -56,7 +53,7 @@ export function GameBoard() {
 
         <hr />
 
-        <div className="h-56">
+        <div className="h-37">
           {player.deck
             .filter((card) => card.isOnBoard)
             .map((card) => (
@@ -70,25 +67,21 @@ export function GameBoard() {
         </div>
       </section>
 
-      <div>
-        <div>
-          <h1>Player</h1>
-          <p>HP: {player.health}</p>
-          <p>Mana: {player.mana}</p>
-        </div>
-        <div className="relative flex items-center justify-center">
+      <div className="relative">
+        <PlayerInfo player={player} typePlayer="player" />
+        <div className="flex items-center justify-center -mb-6">
           {player.deck
             .filter((card) => !card.isOnBoard)
             .slice(0, 6)
             .map((card, index, array) => (
-              <button
-                className="h-36 w-24 bg-white inline-block -ml-2 rounded-lg"
+              <HandCard
+                card={card}
                 style={{
                   transform: `rotate(${calculateRotation(index, array.length)}deg)`,
                 }}
                 key={card.id}
                 onClick={() => playCard(card.id)}
-              />
+              ></HandCard>
             ))}
         </div>
       </div>

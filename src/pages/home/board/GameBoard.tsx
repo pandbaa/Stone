@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useGameStore } from "../../../store/game/game.store";
 import { HandCard } from "./HandCard";
 import { PlayerInfo } from "./PlayerInfo";
@@ -5,14 +6,18 @@ import { PlayerInfo } from "./PlayerInfo";
 export function GameBoard() {
   const { player, opponent, playCard, endTurn, currentTurn } = useGameStore();
 
-  const calculateRotationOpponent = (index: number, total: number) => {
+  const getStyleRotation = (
+    index: number,
+    total: number,
+    isPlayer?: boolean,
+  ): CSSProperties => {
     const middle = (total - 1) / 2;
-    return -(index - middle) * 10;
-  };
+    const rotate = (index - middle) * 10;
 
-  const calculateRotation = (index: number, total: number) => {
-    const middle = (total - 1) / 2;
-    return (index - middle) * 10;
+    const translateY = Math.pow(Math.abs(index - middle), 2) * 7;
+    return {
+      transform: `rotate(${isPlayer ? rotate : -rotate}deg) translateY(${isPlayer ? translateY : -translateY}px)`,
+    };
   };
 
   return (
@@ -27,9 +32,7 @@ export function GameBoard() {
               <HandCard
                 card={card}
                 isHided
-                style={{
-                  transform: `rotate(${calculateRotationOpponent(index, array.length)}deg)`,
-                }}
+                style={getStyleRotation(index, array.length, false)}
                 key={card.id}
                 onClick={() => playCard(card.id)}
               ></HandCard>
@@ -76,9 +79,7 @@ export function GameBoard() {
             .map((card, index, array) => (
               <HandCard
                 card={card}
-                style={{
-                  transform: `rotate(${calculateRotation(index, array.length)}deg)`,
-                }}
+                style={getStyleRotation(index, array.length, true)}
                 key={card.id}
                 onClick={() => playCard(card.id)}
               ></HandCard>

@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { ICard } from "../../../types/card.types";
 import cn from "clsx";
 import { motion } from "framer-motion";
@@ -26,7 +25,7 @@ export function HandCard({
     index: number,
     total: number,
     isPlayer?: boolean,
-  ) => {
+  ) : MotionProps => {
     const middle = (total - 1) / 2;
     const rotate = (index - middle) * 10 * (isPlayer ? 1 : -1);
     const translateY =

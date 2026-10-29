@@ -2,7 +2,7 @@
 
 @theme {
   --color-primary-top: #826f54;
-  --color-primary-bottom: #c09e70; 
+  --color-primary-bottom: #c09e70;
   --color-secondary: #f9edd0;
   --color-black: #000;
   --color-white: #f9f9f9;
@@ -25,17 +25,21 @@
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply font-serif;
     font-weight: 700;
   }
-  button, input, select, textarea {
+  button,
+  input,
+  select,
+  textarea {
     @apply font-serif;
     font-weight: 700;
   }
 }
 
-:root { 
+:root {
   line-height: 1.1;
   font-weight: 700;
   font-size: 25px;
@@ -43,7 +47,8 @@
   color-scheme: light dark;
   color: #333;
   background-color: #3783a9;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url(../img/bg.png);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url(../img/bg.png);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -59,7 +64,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow: hidden;
-  color: #DACEA6;
+  color: #dacea6;
 }
 
 h1 {

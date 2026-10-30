@@ -1,6 +1,6 @@
 import { useGameStore } from "../../../store/game/game.store";
 import { HandCard } from "./HandCard";
-import { PlayerInfo } from "./PlayerInfo";
+import { PlayerInfo } from "./player-info/PlayerInfo";
 import { GridBoardCards } from "./board-card/GridBoardCards";
 
 export function GameBoard() {
@@ -36,7 +36,7 @@ export function GameBoard() {
         </div>
         <GridBoardCards deck={opponent.deck} />
       </section>
-      <hr className="opacity-20 border-#04465F"/>
+      <hr className="opacity-20 border-#04465F" />
       <section>
         <GridBoardCards deck={player.deck} />
         <PlayerInfo player={player} typePlayer="player" />

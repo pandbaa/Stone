@@ -42,7 +42,7 @@ export function HandCard({
   return (
     <motion.button
       className={cn(
-        "h-26 w-18 inline-block -ml-5 rounded-lg cursor-pointer will-change-transform",
+        "h-26 w-18 inline-block -ml-5 rounded-xl cursor-pointer will-change-transform",
         {
           "opacity-50": isDisabled,
         },

@@ -4,6 +4,7 @@ import { PlayerInfo } from "./player-info/PlayerInfo";
 import { GridBoardCards } from "./board-card/GridBoardCards";
 import { PlayerMana } from "./player-info/mana/PlayerMana";
 import { MAX_HAND_CARDS, MAX_MANA } from "../../../constants/game/core.constants";
+import { AudioPlayer } from "./AudioPlayer";;
 
 export function GameBoard() {
   const { player, opponent, playCard, endTurn, currentTurn } = useGameStore();
@@ -44,6 +45,8 @@ export function GameBoard() {
         <GridBoardCards deck={player.deck} />
         <PlayerInfo player={player} typePlayer="player" />
         <PlayerMana currentMana={player.mana} maxMana={MAX_MANA} typePlayer='player' />
+        <AudioPlayer />
+
         <div className="absolute bottom-0 left-0 w-full">
           <div className="flex items-center justify-center">
             {player.deck

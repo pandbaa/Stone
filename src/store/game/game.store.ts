@@ -1,4 +1,5 @@
 import { CARDS } from "../../constants/game/cards.constants";
+import { MAX_MANA } from "../../constants/game/core.constants";
 import type { IGameCard, IGameStore, TPlayer, IHero } from "./game.types";
 import { create } from "zustand";
 
@@ -18,12 +19,12 @@ const initialGameData: Pick<
   player: {
     deck: createDeck(),
     health: 25,
-    mana: 100,
+    mana: 10,
   },
   opponent: {
     deck: createDeck(),
     health: 25,
-    mana: 100,
+    mana: 1,
   },
   currentTurn: "player",
   isGameOver: false,
@@ -31,7 +32,7 @@ const initialGameData: Pick<
 };
 
 const getNewMana = (newTurn: TPlayer, currentMana: number) => {
-  return newTurn === "player" ? Math.min(currentMana + 1, 6) : currentMana;
+  return newTurn === "player" ? Math.min(currentMana + 1, MAX_MANA) : currentMana;
 };
 const resetAttack = (deck: IGameCard[]) =>
   deck.map((card) => ({

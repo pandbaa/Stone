@@ -27,7 +27,7 @@ export function PlayerInfo({ player, typePlayer }: Props) {
         alt={typePlayer}
       />
       <div className="absolute left-1/2 -translate-x-1/2 -translate-y-3/4">
-        <Badge value={player.health} maxValue={MAX_HP} color="green" />
+        <Badge value={player.health} maxValue={MAX_HP} color="red" />
       </div>
     </div>
   );

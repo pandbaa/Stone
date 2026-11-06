@@ -3,9 +3,12 @@ import { HandCard } from "./HandCard";
 import { PlayerInfo } from "./player-info/PlayerInfo";
 import { GridBoardCards } from "./board-card/GridBoardCards";
 import { PlayerMana } from "./player-info/mana/PlayerMana";
-import { MAX_HAND_CARDS, MAX_MANA } from "../../../constants/game/core.constants";
+import {
+  MAX_HAND_CARDS,
+  MAX_MANA,
+} from "../../../constants/game/core.constants";
 import { AudioPlayer } from "./AudioPlayer";
-import {EndTurnButton} from "./EndTurnButton";
+import { EndTurnButton } from "./EndTurnButton";
 
 export function GameBoard() {
   const { player, opponent, playCard } = useGameStore();
@@ -20,7 +23,11 @@ export function GameBoard() {
       <section>
         <div>
           <PlayerInfo player={opponent} typePlayer="opponent" />
-          <PlayerMana currentMana={opponent.mana} maxMana={MAX_MANA} typePlayer='opponent' />
+          <PlayerMana
+            currentMana={opponent.mana}
+            maxMana={MAX_MANA}
+            typePlayer="opponent"
+          />
           <div className="-top-10 absolute w-full">
             <div className="flex items-center justify-center">
               {opponent.deck
@@ -33,20 +40,27 @@ export function GameBoard() {
                     arrayLen={array.length}
                     index={index}
                     key={card.id}
-                    onClick={() => playCard(card.id)}
-                  ></HandCard>
+                  />
                 ))}
             </div>
           </div>
         </div>
         <GridBoardCards deck={opponent.deck} />
       </section>
-      <EndTurnButton />
-      <hr className="opacity-20 border-#04465F" />
+
+      <div>
+        <hr className="opacity-20 border-#04465F w-17/20" />
+        <EndTurnButton />
+      </div>
+
       <section>
         <GridBoardCards deck={player.deck} />
         <PlayerInfo player={player} typePlayer="player" />
-        <PlayerMana currentMana={player.mana} maxMana={MAX_MANA} typePlayer='player' />
+        <PlayerMana
+          currentMana={player.mana}
+          maxMana={MAX_MANA}
+          typePlayer="player"
+        />
         <AudioPlayer />
 
         <div className="absolute bottom-0 left-0 w-full">
@@ -61,7 +75,8 @@ export function GameBoard() {
                   index={index}
                   key={card.id}
                   onClick={() => playCard(card.id)}
-                ></HandCard>
+                  isDisabled={player.mana < card.mana}
+                />
               ))}
           </div>
         </div>

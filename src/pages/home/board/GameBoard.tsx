@@ -4,10 +4,11 @@ import { PlayerInfo } from "./player-info/PlayerInfo";
 import { GridBoardCards } from "./board-card/GridBoardCards";
 import { PlayerMana } from "./player-info/mana/PlayerMana";
 import { MAX_HAND_CARDS, MAX_MANA } from "../../../constants/game/core.constants";
-import { AudioPlayer } from "./AudioPlayer";;
+import { AudioPlayer } from "./AudioPlayer";
+import {EndTurnButton} from "./EndTurnButton";
 
 export function GameBoard() {
-  const { player, opponent, playCard, endTurn, currentTurn } = useGameStore();
+  const { player, opponent, playCard } = useGameStore();
 
   return (
     <div
@@ -40,6 +41,7 @@ export function GameBoard() {
         </div>
         <GridBoardCards deck={opponent.deck} />
       </section>
+      <EndTurnButton />
       <hr className="opacity-20 border-#04465F" />
       <section>
         <GridBoardCards deck={player.deck} />

@@ -145,6 +145,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
         attacker.isCanAttack = false;
         if (opponent.health <= 0) {
           state.isGameOver = true;
+          state.isGameStarted=false
         }
       }
 
@@ -152,9 +153,13 @@ const useGameStore = create<IGameStore>((set, get) => ({
         player: state.player,
         opponent: state.opponent,
         isGameOver: state.isGameOver,
+        isGameStarted: state.isGameStarted
       };
     });
   },
+  resetGameOver: ()=>set({
+    isGameOver: false
+  })
 }));
 
 export { useGameStore };

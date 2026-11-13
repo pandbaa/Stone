@@ -19,6 +19,7 @@ export function PlayerInfo({ player, typePlayer }: Props) {
     >
       <img
         width={150}
+        className="drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"
         src={
           isPlayer
             ? "../../../../../img/Heroes/Player.png"

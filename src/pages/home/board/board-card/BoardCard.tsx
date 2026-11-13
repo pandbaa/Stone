@@ -1,12 +1,14 @@
 import type { IGameCard } from "../../../../store/game/game.types";
 import { motion } from "framer-motion";
 import cn from "clsx";
+import { useGameStore } from "../../../../store/game/game.store";
 
 interface Props {
   card: IGameCard;
 }
 
 export function BoardCard({ card }: Props) {
+  const { returnCard } = useGameStore();
   return (
     <motion.button
       className={cn("h-34 w-24 shadow-2xl mx-1 border-2", {
@@ -21,6 +23,11 @@ export function BoardCard({ card }: Props) {
         damping: 20,
         mass: 2,
       }}
+      onClick={
+        card.isCanAttack
+          ? () => console.log("Атака!")
+          : () => returnCard(card.id)
+      }
     >
       <img src={card.imageUrl} alt={card.name} />
     </motion.button>

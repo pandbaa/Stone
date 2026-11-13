@@ -159,7 +159,25 @@ const useGameStore = create<IGameStore>((set, get) => ({
   },
   resetGameOver: ()=>set({
     isGameOver: false
-  })
+  }),
+  returnCard: (cardId: number) => {
+    const state = get();
+    const isPlayerTurn = state.currentTurn === "player";
+    const currentPlayer = isPlayerTurn ? state.player : state.opponent;
+    const currentCard = currentPlayer.deck.find((card) => card.id === cardId);
+
+    if (!currentCard || !currentCard.isOnBoard) return;
+    
+    const updatedPlayer: IHero = {
+      ...currentPlayer,
+      mana: currentPlayer.mana+currentCard.mana,
+      deck: currentPlayer.deck.map((card) =>
+        card.id === cardId ? { ...card, isOnBoard: false } : card,
+      ),
+    };
+
+    set(isPlayerTurn ? { player: updatedPlayer } : { opponent: updatedPlayer });
+  },
 }));
 
 export { useGameStore };

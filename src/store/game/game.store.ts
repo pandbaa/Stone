@@ -1,6 +1,12 @@
 import { CARDS } from "../../constants/game/cards.constants";
 import { MAX_MANA } from "../../constants/game/core.constants";
-import type { IGameCard, IGameStore, TPlayer, IHero } from "./game.types";
+import type {
+  IGameCard,
+  IGameStore,
+  TPlayer,
+  IHero,
+  IGameFnStore,
+} from "./game.types";
 import { create } from "zustand";
 
 export function createDeck(): IGameCard[] {
@@ -12,10 +18,7 @@ export function createDeck(): IGameCard[] {
   }));
 }
 
-const initialGameData: Pick<
-  IGameStore,
-  "player" | "opponent" | "currentTurn" | "isGameOver" | "isGameStarted"
-> = {
+const initialGameData: Omit<IGameStore, keyof IGameFnStore> = {
   player: {
     deck: createDeck(),
     health: 25,
@@ -29,10 +32,13 @@ const initialGameData: Pick<
   currentTurn: "player",
   isGameOver: false,
   isGameStarted: true,
+  turn: 1,
 };
 
-const getNewMana = (newTurn: TPlayer, currentMana: number) => {
-  return newTurn === "player" ? Math.min(currentMana + 1, MAX_MANA) : currentMana;
+const getNewMana = (newTurn: TPlayer, currentTurn: number) => {
+  return newTurn === "player"
+    ? Math.min(currentTurn, MAX_MANA)
+    : currentTurn;
 };
 const resetAttack = (deck: IGameCard[]) =>
   deck.map((card) => ({
@@ -50,9 +56,10 @@ const useGameStore = create<IGameStore>((set, get) => ({
     const state = get();
     const newTurn: TPlayer =
       state.currentTurn === "player" ? "opponent" : "player";
-    const newPlayerMana = getNewMana("player", state.player.mana);
-    const newOpponentMana = getNewMana("opponent", state.opponent.mana);
+    const newPlayerMana = getNewMana("player", state.turn);
+    const newOpponentMana = getNewMana("opponent", state.turn);
     const newState = {
+      turn: state.turn + 1,
       currentTurn: newTurn,
       player: {
         ...state.player,
@@ -145,7 +152,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
         attacker.isCanAttack = false;
         if (opponent.health <= 0) {
           state.isGameOver = true;
-          state.isGameStarted=false
+          state.isGameStarted = false;
         }
       }
 
@@ -153,13 +160,14 @@ const useGameStore = create<IGameStore>((set, get) => ({
         player: state.player,
         opponent: state.opponent,
         isGameOver: state.isGameOver,
-        isGameStarted: state.isGameStarted
+        isGameStarted: state.isGameStarted,
       };
     });
   },
-  resetGameOver: ()=>set({
-    isGameOver: false
-  }),
+  resetGameOver: () =>
+    set({
+      isGameOver: false,
+    }),
   returnCard: (cardId: number) => {
     const state = get();
     const isPlayerTurn = state.currentTurn === "player";
@@ -167,10 +175,10 @@ const useGameStore = create<IGameStore>((set, get) => ({
     const currentCard = currentPlayer.deck.find((card) => card.id === cardId);
 
     if (!currentCard || !currentCard.isOnBoard) return;
-    
+
     const updatedPlayer: IHero = {
       ...currentPlayer,
-      mana: currentPlayer.mana+currentCard.mana,
+      mana: currentPlayer.mana + currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
         card.id === cardId ? { ...card, isOnBoard: false } : card,
       ),

@@ -14,12 +14,7 @@ export interface IHero {
   mana: number;
 }
 
-export interface IGameStore {
-  isGameStarted: boolean;
-  player: IHero;
-  opponent: IHero;
-  currentTurn: TPlayer;
-  isGameOver: boolean;
+export interface IGameFnStore {
   startGame: () => void;
   endTurn: () => void;
   playCard: (cardId: number) => void;
@@ -29,6 +24,15 @@ export interface IGameStore {
     attackerType: TPlayer,
   ) => void;
   attackHero: (attacherId: number) => void;
-  resetGameOver: ()=>void,
-  returnCard:(cardId: number) => void;
+  resetGameOver: () => void;
+  returnCard: (cardId: number) => void;
+}
+
+export interface IGameStore extends IGameFnStore {
+  isGameStarted: boolean;
+  player: IHero;
+  opponent: IHero;
+  currentTurn: TPlayer;
+  isGameOver: boolean;
+  turn: number
 }

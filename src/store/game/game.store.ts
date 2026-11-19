@@ -1,5 +1,5 @@
 import { CARDS } from "../../constants/game/cards.constants";
-import { MAX_MANA } from "../../constants/game/core.constants";
+import { MAX_HAND_CARDS, MAX_MANA } from "../../constants/game/core.constants";
 import type {
   IGameCard,
   IGameStore,
@@ -8,24 +8,28 @@ import type {
   IGameFnStore,
 } from "./game.types";
 import { create } from "zustand";
+import shuffle from "lodash/shuffle";
+import { drawCardAction } from "./drawCards";
 
 export function createDeck(): IGameCard[] {
   return CARDS.map((card, index) => ({
     ...card,
     id: index + 1,
+    isTaken: false,
     isOnBoard: false,
+    isOnHand: false,
     isCanAttack: false,
   }));
 }
 
 const initialGameData: Omit<IGameStore, keyof IGameFnStore> = {
   player: {
-    deck: createDeck(),
+    deck: [],
     health: 25,
     mana: 10,
   },
   opponent: {
-    deck: createDeck(),
+    deck: [],
     health: 25,
     mana: 1,
   },
@@ -36,11 +40,10 @@ const initialGameData: Omit<IGameStore, keyof IGameFnStore> = {
 };
 
 const getNewMana = (newTurn: TPlayer, currentTurn: number) => {
-  return newTurn === "player"
-    ? Math.min(currentTurn, MAX_MANA)
-    : currentTurn;
+  return newTurn === "player" ? Math.min(currentTurn, MAX_MANA) : currentTurn;
 };
-const resetAttack = (deck: IGameCard[]) =>
+
+const updateAttack = (deck: IGameCard[]) =>
   deck.map((card) => ({
     ...card,
     isCanAttack: card.isOnBoard,
@@ -51,25 +54,50 @@ const getCardById = (cardId: number, deck: IGameCard[]) =>
 const useGameStore = create<IGameStore>((set, get) => ({
   ...initialGameData,
   isGameStarted: false,
-  startGame: () => set(initialGameData),
+  startGame: () => {
+    const deck = createDeck();
+    const playerInitialDeck = shuffle(deck);
+    const opponentInitialDeck = shuffle(deck);
+
+    set({
+      ...initialGameData,
+      player: {
+        ...initialGameData.player,
+        deck: playerInitialDeck.map((card, index) => ({
+          ...card,
+          isOnHand: index < MAX_HAND_CARDS,
+          isTaken: index < MAX_HAND_CARDS,
+        })),
+      },
+      opponent: {
+        ...initialGameData.opponent,
+        deck: opponentInitialDeck.map((card, index) => ({
+          ...card,
+          isOnHand: index < MAX_HAND_CARDS,
+          isTaken: index < MAX_HAND_CARDS,
+        })),
+      },
+    });
+  },
   endTurn: () => {
     const state = get();
     const newTurn: TPlayer =
       state.currentTurn === "player" ? "opponent" : "player";
     const newPlayerMana = getNewMana("player", state.turn);
     const newOpponentMana = getNewMana("opponent", state.turn);
+    
     const newState = {
       turn: state.turn + 1,
       currentTurn: newTurn,
       player: {
         ...state.player,
         mana: newPlayerMana,
-        deck: resetAttack(state.player.deck),
+        deck: updateAttack(newTurn === 'player' ? drawCardAction(state).updateDeck : state.player.deck),
       },
       opponent: {
         ...state.opponent,
         mana: newOpponentMana,
-        deck: resetAttack(state.opponent.deck),
+        deck: updateAttack(newTurn === 'opponent' ? drawCardAction(state).updateDeck : state.opponent.deck),
       },
     };
     set(newState);
@@ -86,7 +114,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
       ...currentPlayer,
       mana: currentPlayer.mana - currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
-        card.id === cardId ? { ...card, isOnBoard: true } : card,
+        card.id === cardId ? { ...card, isOnBoard: true, isOnHand: false } : card,
       ),
     };
 
@@ -140,11 +168,11 @@ const useGameStore = create<IGameStore>((set, get) => ({
 
       const attacker = getCardById(
         attackerId,
-        isAttackerPlayer ? state.opponent.deck : state.player.deck,
+        isAttackerPlayer ? state.player.deck : state.opponent.deck,
       );
       const opponentTaunt = isAttackerPlayer
-        ? state.opponent.deck.find((card) => card.type === "taunt")
-        : state.player.deck.find((card) => card.type === "taunt");
+        ? state.opponent.deck.find((card) => card.type === "taunt" && card.isOnBoard)
+        : state.player.deck.find((card) => card.type === "taunt" && card.isOnBoard);
 
       if (attacker && attacker.isCanAttack && !opponentTaunt) {
         const opponent = state[isAttackerPlayer ? "opponent" : "player"];
@@ -180,7 +208,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
       ...currentPlayer,
       mana: currentPlayer.mana + currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
-        card.id === cardId ? { ...card, isOnBoard: false } : card,
+        card.id === cardId ? { ...card, isOnBoard: false, isOnHand: true } : card,
       ),
     };
 

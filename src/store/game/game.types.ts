@@ -5,13 +5,15 @@ export type TPlayer = "player" | "opponent";
 export interface IGameCard extends ICard {
   id: number;
   isOnBoard: boolean;
+  isOnHand: boolean;
   isCanAttack: boolean;
+  isTaken: boolean;
 }
 
 export interface IHero {
-  deck: IGameCard[];
   health: number;
   mana: number;
+  deck: IGameCard[]
 }
 
 export interface IGameFnStore {

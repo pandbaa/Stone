@@ -29,8 +29,7 @@ export function GameBoard() {
           <div className="-top-10 absolute w-full">
             <div className="flex items-center justify-center">
               {opponent.deck
-                .filter((card) => !card.isOnBoard)
-                .slice(0, MAX_HAND_CARDS)
+                .filter((card) => card.isOnHand)
                 .map((card, index, array) => (
                   <HandCard
                     card={card}
@@ -64,8 +63,7 @@ export function GameBoard() {
         <div className="absolute bottom-0 left-0 w-full">
           <div className="flex items-center justify-center">
             {player.deck
-              .filter((card) => !card.isOnBoard)
-              .slice(0, MAX_HAND_CARDS)
+              .filter((card) => card.isOnHand)
               .map((card, index, array) => (
                 <HandCard
                   card={card}

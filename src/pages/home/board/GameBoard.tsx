@@ -3,10 +3,7 @@ import { HandCard } from "./HandCard";
 import { PlayerInfo } from "./player-info/PlayerInfo";
 import { GridBoardCards } from "./board-card/GridBoardCards";
 import { PlayerMana } from "./player-info/mana/PlayerMana";
-import {
-  MAX_HAND_CARDS,
-  MAX_MANA,
-} from "../../../constants/game/core.constants";
+import { MAX_MANA } from "../../../constants/game/core.constants";
 import { AudioPlayer } from "./AudioPlayer";
 import { EndTurnButton } from "./EndTurnButton";
 import { SectionSide } from "./SectionSide";
@@ -15,9 +12,7 @@ export function GameBoard() {
   const { player, opponent, playCard } = useGameStore();
 
   return (
-    <div
-      className="h-screen w-full relative"
-    >
+    <div className="h-screen w-full relative">
       <SectionSide isPlayer={false}>
         <div>
           <PlayerInfo player={opponent} typePlayer="opponent" />
@@ -42,7 +37,7 @@ export function GameBoard() {
             </div>
           </div>
         </div>
-        <GridBoardCards deck={opponent.deck} isPlayer={false}/>
+        <GridBoardCards deck={opponent.deck} isPlayer={false} />
       </SectionSide>
 
       <div className="absolute top-[50vh] left-0 w-full">
@@ -51,7 +46,7 @@ export function GameBoard() {
       </div>
 
       <SectionSide isPlayer={true}>
-        <GridBoardCards deck={player.deck} isPlayer={true}/>
+        <GridBoardCards deck={player.deck} isPlayer={true} />
         <PlayerInfo player={player} typePlayer="player" />
         <PlayerMana
           currentMana={player.mana}

@@ -2,6 +2,7 @@ import type { IHero, TPlayer } from "../../../../store/game/game.types";
 import cn from "clsx";
 import { Badge } from "../../../../components/ui/Badge";
 import { MAX_HP, MAX_MANA } from "../../../../constants/game/core.constants";
+import { useEnemyTarget } from "../board-card/useEnemyTarget";
 
 interface Props {
   player: Omit<IHero, "deck">;
@@ -9,13 +10,15 @@ interface Props {
 }
 
 export function PlayerInfo({ player, typePlayer }: Props) {
+  const {handleSelectTarget}=useEnemyTarget()
   const isPlayer = typePlayer === "player";
   return (
-    <div
+    <button
       className={cn("absolute z-20 px-1", {
         "bottom-1.5 left-0": isPlayer,
         "top-3 right-0": !isPlayer,
       })}
+      onClick={()=>handleSelectTarget(undefined, true)}
     >
       <img
         width={150}
@@ -30,6 +33,6 @@ export function PlayerInfo({ player, typePlayer }: Props) {
       <div className="absolute left-1/2 -translate-x-1/2 -translate-y-3/4">
         <Badge value={player.health} maxValue={MAX_HP} color="red" />
       </div>
-    </div>
+    </button>
   );
 }

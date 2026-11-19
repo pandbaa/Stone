@@ -16,7 +16,7 @@ export function GridBoardCards({ deck, isPlayer }: Props) {
       {deck
         .filter((card) => card.isOnBoard)
         .map((card) => (
-          <BoardCard key={card.id} card={card} />
+          <BoardCard key={card.id} card={card} isPlayer={isPlayer}/>
         ))}
     </div>
   );

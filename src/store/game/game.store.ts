@@ -10,6 +10,7 @@ import type {
 import { create } from "zustand";
 import shuffle from "lodash/shuffle";
 import { drawCardAction } from "./drawCards";
+import { useNotificationStore } from "../notification/notification.store";
 
 export function createDeck(): IGameCard[] {
   return CARDS.map((card, index) => ({
@@ -85,19 +86,31 @@ const useGameStore = create<IGameStore>((set, get) => ({
       state.currentTurn === "player" ? "opponent" : "player";
     const newPlayerMana = getNewMana("player", state.turn);
     const newOpponentMana = getNewMana("opponent", state.turn);
-    
+
+    if (newTurn === "player") {
+      useNotificationStore.getState().show("Твой ход");
+    }
+
     const newState = {
       turn: state.turn + 1,
       currentTurn: newTurn,
       player: {
         ...state.player,
         mana: newPlayerMana,
-        deck: updateAttack(newTurn === 'player' ? drawCardAction(state).updateDeck : state.player.deck),
+        deck: updateAttack(
+          newTurn === "player"
+            ? drawCardAction(state).updateDeck
+            : state.player.deck,
+        ),
       },
       opponent: {
         ...state.opponent,
         mana: newOpponentMana,
-        deck: updateAttack(newTurn === 'opponent' ? drawCardAction(state).updateDeck : state.opponent.deck),
+        deck: updateAttack(
+          newTurn === "opponent"
+            ? drawCardAction(state).updateDeck
+            : state.opponent.deck,
+        ),
       },
     };
     set(newState);
@@ -114,7 +127,9 @@ const useGameStore = create<IGameStore>((set, get) => ({
       ...currentPlayer,
       mana: currentPlayer.mana - currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
-        card.id === cardId ? { ...card, isOnBoard: true, isOnHand: false } : card,
+        card.id === cardId
+          ? { ...card, isOnBoard: true, isOnHand: false }
+          : card,
       ),
     };
 
@@ -171,8 +186,12 @@ const useGameStore = create<IGameStore>((set, get) => ({
         isAttackerPlayer ? state.player.deck : state.opponent.deck,
       );
       const opponentTaunt = isAttackerPlayer
-        ? state.opponent.deck.find((card) => card.type === "taunt" && card.isOnBoard)
-        : state.player.deck.find((card) => card.type === "taunt" && card.isOnBoard);
+        ? state.opponent.deck.find(
+            (card) => card.type === "taunt" && card.isOnBoard,
+          )
+        : state.player.deck.find(
+            (card) => card.type === "taunt" && card.isOnBoard,
+          );
 
       if (attacker && attacker.isCanAttack && !opponentTaunt) {
         const opponent = state[isAttackerPlayer ? "opponent" : "player"];
@@ -181,6 +200,8 @@ const useGameStore = create<IGameStore>((set, get) => ({
         if (opponent.health <= 0) {
           state.isGameOver = true;
           state.isGameStarted = false;
+
+          useNotificationStore.getState().show(isAttackerPlayer ? 'Ты выйграл!' : "Ты проиграл", isAttackerPlayer ? 'win' : 'lose')
         }
       }
 
@@ -192,10 +213,6 @@ const useGameStore = create<IGameStore>((set, get) => ({
       };
     });
   },
-  resetGameOver: () =>
-    set({
-      isGameOver: false,
-    }),
   returnCard: (cardId: number) => {
     const state = get();
     const isPlayerTurn = state.currentTurn === "player";
@@ -208,7 +225,9 @@ const useGameStore = create<IGameStore>((set, get) => ({
       ...currentPlayer,
       mana: currentPlayer.mana + currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
-        card.id === cardId ? { ...card, isOnBoard: false, isOnHand: true } : card,
+        card.id === cardId
+          ? { ...card, isOnBoard: false, isOnHand: true }
+          : card,
       ),
     };
 

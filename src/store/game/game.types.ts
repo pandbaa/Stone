@@ -26,7 +26,6 @@ export interface IGameFnStore {
     attackerType: TPlayer,
   ) => void;
   attackHero: (attacherId: number) => void;
-  resetGameOver: () => void;
   returnCard: (cardId: number) => void;
 }
 

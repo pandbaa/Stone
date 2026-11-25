@@ -8,6 +8,7 @@ export interface IGameCard extends ICard {
   isOnHand: boolean;
   isCanAttack: boolean;
   isTaken: boolean;
+  isPlayedThisTurn: boolean
 }
 
 export interface IHero {

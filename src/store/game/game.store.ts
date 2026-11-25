@@ -20,6 +20,7 @@ export function createDeck(): IGameCard[] {
     isOnBoard: false,
     isOnHand: false,
     isCanAttack: false,
+    isPlayedThisTurn: false,
   }));
 }
 
@@ -40,14 +41,15 @@ const initialGameData: Omit<IGameStore, keyof IGameFnStore> = {
   turn: 1,
 };
 
-const getNewMana = (newTurn: TPlayer, currentTurn: number) => {
-  return newTurn === "player" ? Math.min(currentTurn, MAX_MANA) : currentTurn;
+const getNewMana = (currentTurn: number) => {
+  return Math.min(currentTurn, MAX_MANA);
 };
 
-const updateAttack = (deck: IGameCard[]) =>
+const updateCardOnTheTurn = (deck: IGameCard[]) =>
   deck.map((card) => ({
     ...card,
     isCanAttack: card.isOnBoard,
+    isPlayedThisTurn: false,
   }));
 const getCardById = (cardId: number, deck: IGameCard[]) =>
   deck.find((card) => card.id === cardId);
@@ -82,43 +84,48 @@ const useGameStore = create<IGameStore>((set, get) => ({
   },
   endTurn: () => {
     const state = get();
+
     const newTurn: TPlayer =
       state.currentTurn === "player" ? "opponent" : "player";
-    const newPlayerMana = getNewMana("player", state.turn);
-    const newOpponentMana = getNewMana("opponent", state.turn);
 
-    if (newTurn === "player") {
-      useNotificationStore.getState().show("Твой ход");
-    }
+    const isNewTurnPlayer = newTurn === "player";
+    const newTurnNumber = isNewTurnPlayer ? state.turn + 1 : state.turn;
 
-    const newState = {
-      turn: state.turn + 1,
+    const playerDeck = isNewTurnPlayer
+      ? drawCardAction(state.player.deck)
+      : state.player.deck;
+
+    const opponentDeck = !isNewTurnPlayer
+      ? drawCardAction(state.opponent.deck)
+      : state.opponent.deck;
+
+    set({
+      turn: newTurnNumber,
       currentTurn: newTurn,
+
       player: {
         ...state.player,
-        mana: newPlayerMana,
-        deck: updateAttack(
-          newTurn === "player"
-            ? drawCardAction(state).updateDeck
-            : state.player.deck,
-        ),
+        mana: isNewTurnPlayer ? getNewMana(newTurnNumber) : state.player.mana,
+        deck: updateCardOnTheTurn(playerDeck),
       },
+
       opponent: {
         ...state.opponent,
-        mana: newOpponentMana,
-        deck: updateAttack(
-          newTurn === "opponent"
-            ? drawCardAction(state).updateDeck
-            : state.opponent.deck,
-        ),
+        mana: !isNewTurnPlayer
+          ? getNewMana(newTurnNumber)
+          : state.opponent.mana,
+        deck: updateCardOnTheTurn(opponentDeck),
       },
-    };
-    set(newState);
+    });
+
+    if (isNewTurnPlayer) {
+      useNotificationStore.getState().show("Твой ход");
+    }
   },
   playCard: (cardId: number) => {
     const state = get();
-    const isPlayerTurn = state.currentTurn === "player";
-    const currentPlayer = isPlayerTurn ? state.player : state.opponent;
+    const currentPlayer =
+      state.currentTurn === "player" ? state.player : state.opponent;
     const currentCard = currentPlayer.deck.find((card) => card.id === cardId);
 
     if (!currentCard || currentPlayer.mana < currentCard.mana) return;
@@ -128,16 +135,25 @@ const useGameStore = create<IGameStore>((set, get) => ({
       mana: currentPlayer.mana - currentCard.mana,
       deck: currentPlayer.deck.map((card) =>
         card.id === cardId
-          ? { ...card, isOnBoard: true, isOnHand: false }
+          ? {
+              ...card,
+              isOnBoard: true,
+              isOnHand: false,
+              isPlayedThisTurn: true,
+            }
           : card,
       ),
     };
 
-    set(isPlayerTurn ? { player: updatedPlayer } : { opponent: updatedPlayer });
+    set(
+      state.currentTurn === "player"
+        ? { player: updatedPlayer }
+        : { opponent: updatedPlayer },
+    );
   },
   attackCard: (attackerId: number, targetId: number, attackerType: TPlayer) => {
     set((state) => {
-      const isAttackerPlayer = attackerType === "player";
+      const isAttackerPlayer = state.currentTurn === "player";
 
       const attackerDeck = isAttackerPlayer
         ? state.player.deck
@@ -201,7 +217,12 @@ const useGameStore = create<IGameStore>((set, get) => ({
           state.isGameOver = true;
           state.isGameStarted = false;
 
-          useNotificationStore.getState().show(isAttackerPlayer ? 'Ты выйграл!' : "Ты проиграл", isAttackerPlayer ? 'win' : 'lose')
+          useNotificationStore
+            .getState()
+            .show(
+              isAttackerPlayer ? "Ты выйграл!" : "Ты проиграл",
+              isAttackerPlayer ? "win" : "lose",
+            );
         }
       }
 
@@ -215,8 +236,8 @@ const useGameStore = create<IGameStore>((set, get) => ({
   },
   returnCard: (cardId: number) => {
     const state = get();
-    const isPlayerTurn = state.currentTurn === "player";
-    const currentPlayer = isPlayerTurn ? state.player : state.opponent;
+    const currentPlayer =
+      state.currentTurn === "player" ? state.player : state.opponent;
     const currentCard = currentPlayer.deck.find((card) => card.id === cardId);
 
     if (!currentCard || !currentCard.isOnBoard) return;
@@ -231,7 +252,11 @@ const useGameStore = create<IGameStore>((set, get) => ({
       ),
     };
 
-    set(isPlayerTurn ? { player: updatedPlayer } : { opponent: updatedPlayer });
+    set(
+      state.currentTurn === "player"
+        ? { player: updatedPlayer }
+        : { opponent: updatedPlayer },
+    );
   },
 }));
 

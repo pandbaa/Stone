@@ -4,6 +4,7 @@ import { useGameStore } from "../../../store/game/game.store";
 export function EndTurnButton() {
   const { endTurn, currentTurn } = useGameStore();
   const isOpponentTurn = currentTurn === 'opponent'
+
   return (
     <Button
       variant="primary"

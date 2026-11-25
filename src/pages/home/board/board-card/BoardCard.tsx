@@ -11,13 +11,20 @@ interface Props {
 }
 
 export function BoardCard({ card, isPlayer }: Props) {
-  const { returnCard } = useGameStore();
+  const { returnCard, currentTurn } = useGameStore();
   const { handleSelectTarget } = useEnemyTarget();
   const { setCardAttackerId, cardAttackerId } = useSelectAttacker();
 
   const handleClick = (cardId: number) => {
+    if (currentTurn !== "player") return;
+
+    console.log(card.isPlayedThisTurn)
     if (isPlayer) {
-      card.isCanAttack ? setCardAttackerId(cardId) : returnCard(cardId);
+      if (card.isCanAttack) {
+        setCardAttackerId(cardId);
+      } else if (card.isPlayedThisTurn) {
+        returnCard(cardId);
+      }
     } else {
       handleSelectTarget(cardId);
     }
@@ -27,10 +34,14 @@ export function BoardCard({ card, isPlayer }: Props) {
   return (
     <motion.button
       className={cn("h-34 w-24 shadow-2xl mx-1", {
-        
         "border-2 cursor-pointer border-[#1D9942]":
-          card.isCanAttack && !isPlayerSelectAttacker && isPlayer,
+          card.isCanAttack &&
+          !isPlayerSelectAttacker &&
+          isPlayer &&
+          currentTurn === "player",
         "border-2 border-[#C7C40F]": isPlayerSelectAttacker,
+        "border-2 border-[#C90819]": !isPlayer && cardAttackerId,
+        "cursor-default": currentTurn!=='player'
       })}
       initial={{ scale: 0.9, rotate: -15, y: 100, opacity: 0 }}
       animate={{ scale: 1, rotate: 0, y: 0, opacity: 1 }}
@@ -40,7 +51,7 @@ export function BoardCard({ card, isPlayer }: Props) {
         damping: 20,
         mass: 2,
       }}
-      onClick={() => handleClick(card.id)}
+      onClick={() => currentTurn!=='player' ? null: handleClick(card.id)}
     >
       <img src={card.imageUrl} alt={card.name} />
     </motion.button>

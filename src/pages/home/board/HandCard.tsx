@@ -2,6 +2,7 @@ import type { ICard } from "../../../types/card.types";
 import cn from "clsx";
 import { motion } from "framer-motion";
 import type { MotionProps } from "framer-motion";
+import { useGameStore } from "../../../store/game/game.store";
 
 interface Props {
   card: ICard;
@@ -20,12 +21,16 @@ export function HandCard({
   index,
   arrayLen,
 }: Props) {
+  const { currentTurn } = useGameStore();
+  const isDisabledButton =
+    isDisabled || (currentTurn !== "player" && !isHided);
+  const isInteractive = !isHided && !isDisabledButton;
 
   const getStyleRotation = (
     index: number,
     total: number,
     isPlayer?: boolean,
-  ) : MotionProps => {
+  ): MotionProps => {
     const middle = (total - 1) / 2;
     const rotate = (index - middle) * 10 * (isPlayer ? 1 : -1);
     const translateY =
@@ -34,7 +39,10 @@ export function HandCard({
     return {
       initial: { scale: 1, y: 0, zIndex: 0, rotate: 0 },
       animate: { rotate, y: translateY },
-      whileHover: isPlayer && !isDisabled ? {scale: 1.2, zIndex: 10, y: translateY - 105} : {},
+      whileHover:
+        isPlayer && isInteractive
+          ? { scale: 1.2, zIndex: 10, y: translateY - 105 }
+          : {},
       transition: { type: "spring" as const, stiffness: 300, damping: 40 },
     };
   };
@@ -44,14 +52,16 @@ export function HandCard({
       className={cn(
         "h-26 w-18 inline-block -ml-5 will-change-transform relative",
         {
-          "cursor-pointer": !isHided && !isDisabled
+          "cursor-pointer": isInteractive,
         },
       )}
       onClick={onClick}
-      disabled={isDisabled}
+      disabled={isDisabledButton}
       {...getStyleRotation(index, arrayLen, !isHided)}
     >
-      {isDisabled && <div className="absolute w-full top-0 left-0 h-full bg-black/60 z-[1]"/>}
+      {isDisabledButton && (
+        <div className="absolute w-full top-0 left-0 h-full bg-black/60 z-[1]" />
+      )}
       <img
         src={isHided ? "../../../../img/Cards/cardback.png" : card.imageUrl}
         alt={card.name}

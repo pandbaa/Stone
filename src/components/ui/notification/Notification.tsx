@@ -7,10 +7,16 @@ export function Notification() {
 
   return (
     !!message && (
-      <div className="fixed z-50 w-full left-0 top-0">
-        <motion.div
+      <motion.div
+        className="fixed z-50 w-full h-full left-0 top-0 flex items-center justify-center bg-[#0A2A39]/70"
+        initial={{ opacity: 0, zoom: 1 }}
+        animate={{ opacity: 1, zoom: 1.1 }}
+        exit={{opacity: 0, zoom: 1}}
+        transition={{duration: 0.5,}}
+      >
+        <div
           className={cn(
-            "py-3 px-4 top-4 right-4 mx-auto w-max text-xl shadow-2xl rounded-lg text-white",
+            "py-3 px-4 top-4 right-4 w-max text-xl shadow-2xl rounded-lg text-white",
             {
               "bg-gradient-to-b from-[#011F08] to-[#079933]": type === "win",
               "bg-gradient-to-b from-[#69040D] to-[#C90819]": type === "lose",
@@ -18,18 +24,10 @@ export function Notification() {
                 type === "info",
             },
           )}
-          initial={{ y: -200, opacity: 0 }}
-          animate={{ y: 20, opacity: 1 }}
-          transition={{
-            type: "spring" as const,
-            stiffness: 150,
-            damping: 20,
-            mass: 2,
-          }}
         >
           {message}
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     )
   );
 }

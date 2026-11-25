@@ -1,8 +1,10 @@
 import type { IHero, TPlayer } from "../../../../store/game/game.types";
 import cn from "clsx";
 import { Badge } from "../../../../components/ui/Badge";
-import { MAX_HP, MAX_MANA } from "../../../../constants/game/core.constants";
+import { MAX_HP } from "../../../../constants/game/core.constants";
 import { useEnemyTarget } from "../board-card/useEnemyTarget";
+import { useGameStore } from "../../../../store/game/game.store";
+import { useSelectAttacker } from "../../../../store/game/select-attacker";
 
 interface Props {
   player: Omit<IHero, "deck">;
@@ -10,15 +12,23 @@ interface Props {
 }
 
 export function PlayerInfo({ player, typePlayer }: Props) {
-  const {handleSelectTarget}=useEnemyTarget()
+  const { handleSelectTarget } = useEnemyTarget();
+  const {currentTurn, opponent} = useGameStore()
+  const {cardAttackerId} = useSelectAttacker()
+
+  const opponentTaunt=opponent.deck.find((card) => card.type === "taunt" && card.isOnBoard)
   const isPlayer = typePlayer === "player";
+
   return (
     <button
-      className={cn("absolute z-20 px-1", {
+      className={cn("absolute z-20 px-1 border-2 border-transparent", {
         "bottom-1.5 left-0": isPlayer,
         "top-3 right-0": !isPlayer,
+        'cursor-pointer': !isPlayer && currentTurn==='player',
+        '!border-[#C90819] rounded-lg': !isPlayer && cardAttackerId && !opponentTaunt
       })}
-      onClick={()=>handleSelectTarget(undefined, true)}
+      disabled={isPlayer || currentTurn === 'opponent'}
+      onClick={() => (isPlayer ? null : handleSelectTarget(undefined, true))}
     >
       <img
         width={150}

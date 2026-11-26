@@ -3,31 +3,31 @@ import type { ICard } from "../../types/card.types";
 export type TPlayer = "player" | "opponent";
 
 export interface IGameCard extends ICard {
-  id: number;
+  id: string;
   isOnBoard: boolean;
   isOnHand: boolean;
   isCanAttack: boolean;
   isTaken: boolean;
-  isPlayedThisTurn: boolean
+  isPlayedThisTurn: boolean;
 }
 
 export interface IHero {
   health: number;
   mana: number;
-  deck: IGameCard[]
+  deck: IGameCard[];
 }
 
 export interface IGameFnStore {
   startGame: () => void;
   endTurn: () => void;
-  playCard: (cardId: number) => void;
+  playCard: (cardId: string) => void;
   attackCard: (
-    attacherId: number,
-    targetId: number,
+    attacherId: string,
+    targetId: string,
     attackerType: TPlayer,
   ) => void;
-  attackHero: (attacherId: number) => void;
-  returnCard: (cardId: number) => void;
+  attackHero: (attacherId: string) => void;
+  returnCard: (cardId: string) => void;
 }
 
 export interface IGameStore extends IGameFnStore {
@@ -36,5 +36,5 @@ export interface IGameStore extends IGameFnStore {
   opponent: IHero;
   currentTurn: TPlayer;
   isGameOver: boolean;
-  turn: number
+  turn: number;
 }

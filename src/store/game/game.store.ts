@@ -11,11 +11,12 @@ import { create } from "zustand";
 import shuffle from "lodash/shuffle";
 import { drawCardAction } from "./drawCards";
 import { useNotificationStore } from "../notification/notification.store";
+import { useDamageStore } from "../damage/damage.store";
 
-export function createDeck(): IGameCard[] {
+export function createDeck(typePlayer: TPlayer): IGameCard[] {
   return CARDS.map((card, index) => ({
     ...card,
-    id: index + 1,
+    id: index + 1 + "" + typePlayer,
     isTaken: false,
     isOnBoard: false,
     isOnHand: false,
@@ -51,16 +52,15 @@ const updateCardOnTheTurn = (deck: IGameCard[]) =>
     isCanAttack: card.isOnBoard,
     isPlayedThisTurn: false,
   }));
-const getCardById = (cardId: number, deck: IGameCard[]) =>
+const getCardById = (cardId: string, deck: IGameCard[]) =>
   deck.find((card) => card.id === cardId);
 
 const useGameStore = create<IGameStore>((set, get) => ({
   ...initialGameData,
   isGameStarted: false,
   startGame: () => {
-    const deck = createDeck();
-    const playerInitialDeck = shuffle(deck);
-    const opponentInitialDeck = shuffle(deck);
+    const playerInitialDeck = shuffle(createDeck("player"));
+    const opponentInitialDeck = shuffle(createDeck("opponent"));
 
     set({
       ...initialGameData,
@@ -122,7 +122,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
       useNotificationStore.getState().show("Твой ход");
     }
   },
-  playCard: (cardId: number) => {
+  playCard: (cardId: string) => {
     const state = get();
     const currentPlayer =
       state.currentTurn === "player" ? state.player : state.opponent;
@@ -151,7 +151,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
         : { opponent: updatedPlayer },
     );
   },
-  attackCard: (attackerId: number, targetId: number, attackerType: TPlayer) => {
+  attackCard: (attackerId: string, targetId: string, attackerType: TPlayer) => {
     set((state) => {
       const isAttackerPlayer = state.currentTurn === "player";
 
@@ -168,6 +168,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
 
       if (!attacker || !target || !attacker.isCanAttack) return state;
 
+      useDamageStore.getState().addDamage(targetId, attacker.attack);
       const targetHealth = target.health - attacker.attack;
 
       const updatedAttackerDeck = attackerDeck.map((card) =>
@@ -193,7 +194,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
       };
     });
   },
-  attackHero: (attackerId: number) => {
+  attackHero: (attackerId: string) => {
     set((state) => {
       const isAttackerPlayer = state.currentTurn === "player";
 
@@ -211,6 +212,10 @@ const useGameStore = create<IGameStore>((set, get) => ({
 
       if (attacker && attacker.isCanAttack && !opponentTaunt) {
         const opponent = state[isAttackerPlayer ? "opponent" : "player"];
+        const targetPlayer = isAttackerPlayer ? "opponent" : "player";
+
+        useDamageStore.getState().addDamage(targetPlayer, attacker.attack);
+
         opponent.health -= attacker.attack;
         attacker.isCanAttack = false;
         if (opponent.health <= 0) {
@@ -234,7 +239,7 @@ const useGameStore = create<IGameStore>((set, get) => ({
       };
     });
   },
-  returnCard: (cardId: number) => {
+  returnCard: (cardId: string) => {
     const state = get();
     const currentPlayer =
       state.currentTurn === "player" ? state.player : state.opponent;
